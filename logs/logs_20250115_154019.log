@@ -1,0 +1,9 @@
+2025-01-15 15:40:19,907 - INFO - Starting FastAPI application
+2025-01-15 15:40:24,752 - ERROR - 😞 Failed to initialize Playwright browser: 'coroutine' object has no attribute 'chromium'
+2025-01-15 15:40:24,752 - INFO - 📊 --- Scraping Summary ---
+2025-01-15 15:40:24,752 - INFO - 📰 Total articles scraped: 0
+2025-01-15 15:40:24,753 - INFO - ✅ Valid articles scraped: 0
+2025-01-15 15:40:24,753 - INFO - ⚠️ Incomplete articles skipped: 0
+2025-01-15 15:40:24,753 - INFO - 🔄 Duplicate articles skipped: 0
+2025-01-15 15:40:24,753 - INFO - ⏱️ Scraping duration: 0:00:00.000224
+2025-01-15 15:40:24,753 - INFO - 📊 ------------------------

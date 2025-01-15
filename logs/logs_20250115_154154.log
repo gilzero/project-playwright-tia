@@ -1,0 +1,11 @@
+2025-01-15 15:41:54,814 - INFO - Starting FastAPI application
+2025-01-15 15:42:06,432 - INFO - 🚀 Playwright browser initialized successfully
+2025-01-15 15:42:06,432 - INFO - Navigating to URL: https://www.techinasia.com/news?category=artificial-intelligence
+2025-01-15 15:42:06,435 - ERROR - Playwright error while loading page: Page.goto: Target page, context or browser has been closed
+2025-01-15 15:42:06,443 - INFO - 📊 --- Scraping Summary ---
+2025-01-15 15:42:06,443 - INFO - 📰 Total articles scraped: 0
+2025-01-15 15:42:06,443 - INFO - ✅ Valid articles scraped: 0
+2025-01-15 15:42:06,443 - INFO - ⚠️ Incomplete articles skipped: 0
+2025-01-15 15:42:06,443 - INFO - 🔄 Duplicate articles skipped: 0
+2025-01-15 15:42:06,443 - INFO - ⏱️ Scraping duration: 0:00:01.116986
+2025-01-15 15:42:06,443 - INFO - 📊 ------------------------

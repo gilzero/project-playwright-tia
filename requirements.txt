@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+playwright
+beautifulsoup4
+pandas
+python-dateutil
+tqdm
+jinja2
+python-multipart

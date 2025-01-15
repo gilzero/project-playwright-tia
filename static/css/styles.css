@@ -1,0 +1,44 @@
+/* app/static/css/styles.css */
+body {
+    font-family: sans-serif;
+    margin: 20px;
+}
+.container {
+     width: 80%;
+     margin: auto;
+     padding: 20px;
+     border: 1px solid #ddd;
+     border-radius: 8px;
+     background-color: #f9f9f9;
+ }
+ form {
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+     margin-bottom: 20px;
+ }
+label {
+   margin-bottom: 5px;
+   display: block;
+ }
+
+ input, select, button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+ }
+ table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+ }
+ th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+ }
+th {
+    background-color: #f2f2f2;
+}
