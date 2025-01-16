@@ -107,12 +107,22 @@
                 if (response.ok) {
                     const html = await response.text();
                     document.body.innerHTML = html; // Replace the entire body with the response
+                } else if (response.status === 400) {
+                    const errorText = await response.text();
+                    document.getElementById('error-message').textContent = "Bad Request: " + errorText;
+                    document.getElementById('error-message').style.display = 'block';
+                } else if (response.status === 500) {
+                    const errorText = await response.text();
+                    document.getElementById('error-message').textContent = "Server Error: " + errorText;
+                    document.getElementById('error-message').style.display = 'block';
                 } else {
                     const errorText = await response.text();
-                    document.body.innerHTML = errorText;
-                    console.error('Error:', errorText);
+                    document.getElementById('error-message').textContent = "Unexpected Error: " + errorText;
+                    document.getElementById('error-message').style.display = 'block';
                 }
             } catch (error) {
+                document.getElementById('error-message').textContent = "Network Error: " + error.message;
+                document.getElementById('error-message').style.display = 'block';
                 console.error('Fetch error:', error);
             }
         }

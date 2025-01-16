@@ -48,8 +48,11 @@ class TechInAsiaScraper:
                 self.page = await self.browser.new_page(user_agent=self.config.user_agent)
                 self.scroll_manager = ScrollManager(self.page, self.config)
                 logger.info("🚀 Playwright browser initialized successfully")
+            except PlaywrightError as e:
+                logger.error(f"😞 Playwright error during browser initialization: {e}")
+                raise
             except Exception as e:
-                logger.error(f"😞 Failed to initialize Playwright browser: {e}")
+                logger.error(f"😞 Unexpected error during browser initialization: {e}")
                 raise
 
     def _is_valid_article(self, article: Article) -> bool:
@@ -192,11 +195,15 @@ class TechInAsiaScraper:
         for attempt in range(self.config.retry_count):
             try:
                 return await self._perform_scraping()
+            except PlaywrightTimeoutError as e:
+                logger.warning(f"Attempt {attempt + 1} failed due to timeout: {e}, retrying...")
+            except PlaywrightError as e:
+                logger.warning(f"Attempt {attempt + 1} failed due to Playwright error: {e}, retrying...")
             except Exception as e:
-                logger.warning(f"Attempt {attempt + 1} failed: {e}, retrying...")
-                if attempt == self.config.retry_count - 1:
-                    raise
-                await asyncio.sleep(2 * (attempt + 1))  # Exponential backoff
+                logger.warning(f"Attempt {attempt + 1} failed due to unexpected error: {e}, retrying...")
+            if attempt == self.config.retry_count - 1:
+                raise
+            await asyncio.sleep(2 * (attempt + 1))  # Exponential backoff
 
     async def _perform_scraping(self) -> List[Article]:
         """Perform the actual scraping"""
@@ -213,6 +220,9 @@ class TechInAsiaScraper:
             return articles
         except PlaywrightError as e:
             logger.error(f"Playwright error while loading page: {e}")
+            return articles
+        except Exception as e:
+            logger.error(f"Unexpected error while loading page: {e}")
             return articles
 
         progress_bar = tqdm(total=self.config.num_articles, desc="Scraping Articles", unit="article")
@@ -260,7 +270,7 @@ class TechInAsiaScraper:
             return pd.DataFrame()
 
         # Convert articles to DataFrame
-        df = pd.DataFrame([article.dict() for article in articles])
+        df = pd.DataFrame([article.model_dump() for article in articles])
 
         # Remove duplicates
         df = df.drop_duplicates(subset=['article_url'], keep='first')
@@ -274,9 +284,10 @@ class TechInAsiaScraper:
         """Save DataFrame in batches"""
         batch_size = self.config.batch_size
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename_prefix = getattr(self.config, 'filename_prefix', "techinasia_ai_news")
         for i in range(0, len(df), batch_size):
             batch = df[i:i + batch_size]
-            filename = f"{self.config.output_dir}/techinasia_ai_news_v1_batch_{i//batch_size}_{timestamp}.csv"
+            filename = f"{self.config.output_dir}/{filename_prefix}_batch_{i//batch_size}_{timestamp}.csv"
             try:
                 batch.to_csv(filename, index=False)
                 logger.info(f"Saved batch {i//batch_size + 1} to {filename}")

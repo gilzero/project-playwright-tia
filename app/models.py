@@ -47,6 +47,7 @@ class ScraperConfig(BaseModel):
     min_delay: float = 1
     max_delay: float = 3
     category: str = 'artificial-intelligence'
+    filename_prefix: str = 'techinasia_ai_news'
 
     model_config = ConfigDict(
         frozen=True,
