@@ -10,9 +10,9 @@
 <body>
     <div class="container">
         <h1>TechInAsia Scraper</h1>
-        <form id="scrapeForm" action="/scrape" method="post" onsubmit="return validateForm()">
+        <form id="scrapeForm" action="/scrape" method="post" onsubmit="return submitForm(event)">
             <div id="error-message" class="alert alert-danger" style="display: none;"></div>
-            
+
             <label for="num_articles">Number of Articles:</label>
             <input type="number" id="num_articles" name="num_articles" value="50" required min="1">
 
@@ -44,8 +44,43 @@
                 return false;
             }
             errorMessage.style.display = 'none';
-            showLoadingState();
             return true;
+        }
+
+        async function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission
+            if (!validateForm()) {
+                return;
+            }
+            showLoadingState();
+
+            const form = document.getElementById('scrapeForm');
+            const formData = new FormData(form);
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            try {
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData),
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    document.body.innerHTML = html; // Replace the entire body with the response
+                } else {
+                    const errorText = await response.text();
+                    document.body.innerHTML = errorText;
+                    console.error('Error:', errorText);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
         }
 
         function showLoadingState() {
