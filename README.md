@@ -107,3 +107,16 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 ## Versioning
 v2.0.0 checkpointing
+
+## jupyter notebook
+
+- [test01.ipynb](./test01.ipynb)
+
+description:
+
+- web scraping system designed to fetch and process content from webpages. 
+- It uses Playwright for browser automation, simulating human-like behavior such as scrolling and mouse movements to evade detection. 
+- The Config class defines customizable parameters for user interaction simulation, timeouts, retries, and logging. 
+- The asynchronous functions manage tasks like content extraction, retry mechanisms for failed requests, and processing a batch of URLs from a DataFrame. 
+- Finally, the scraped data is saved to a JSON file with error handling to ensure reliability and robustness. This system is suitable for scalable and dynamic content extraction workflows.
+
