@@ -16,7 +16,7 @@ def setup_logging():
             logging.StreamHandler()
         ]
     )
-    return logging.getLogger(__name__)
+    return logging.getLogger('app_logger')
 
 
 def setup_output_directory(output_dir):

@@ -103,3 +103,4 @@ The scraped article data is saved in batches as CSV files in the `output` direct
 -   Add more error handling logic.
 
 ## License
+This project is licensed under the MIT License. See the LICENSE file for more details.

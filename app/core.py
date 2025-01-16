@@ -11,6 +11,7 @@ from app.utils import setup_output_directory, setup_logging
 from tqdm import tqdm
 from playwright.async_api import Error as PlaywrightError
 from datetime import datetime
+import asyncio
 
 logger = setup_logging()
 
@@ -24,7 +25,7 @@ class ScrollManager:
         """Scroll the page and return True if new content was loaded"""
         last_height = await self.page.evaluate("document.body.scrollHeight")
         await self.page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(uniform(self.config.min_delay, self.config.max_delay))
+        await asyncio.sleep(uniform(self.config.min_delay, self.config.max_delay))
         new_height = await self.page.evaluate("document.body.scrollHeight")
         return new_height > last_height
 
@@ -63,98 +64,111 @@ class TechInAsiaScraper:
         return article
 
     def parse_article(self, article_element) -> Optional[Article]:
-       """Parse a single article element"""
-       article_id = None
-       title = None
-       article_url = None
-       source = None
-       source_url = None
-       image_url = None
-       posted_time = None
-       relative_time = None
-       categories = []
-       tags = []
+        """Parse a single article element"""
+        try:
+            content_div = article_element.find('div', class_='post-content')
+            article_id, article_url = self._extract_article_id_and_url(content_div)
+            if not article_id or not article_url:
+                return None
 
-       try:
-           content_div = article_element.find('div', class_='post-content')
+            title = self._extract_title(content_div)
+            source, source_url = self._extract_source_info(content_div)
+            image_url = self._extract_image_url(article_element)
+            posted_time, relative_time = self._extract_time_info(article_element)
+            categories, tags = self._extract_categories_and_tags(article_element)
 
-           # Extract article information
-           title_element = content_div.find('h3', class_='post-title')
-           title = title_element.text.strip() if title_element else None
+            article = Article(
+                article_id=article_id,
+                title=title,
+                article_url=article_url,
+                source=source,
+                source_url=source_url,
+                image_url=image_url,
+                posted_time=posted_time,
+                relative_time=relative_time,
+                categories=categories,
+                tags=tags,
+            )
+            logger.info(f"🎉 Article parsing complete: {article_id}")
+            return article
 
-           # Get article URL and ID first
-           article_links = [a for a in content_div.find_all('a') if not 'post-source' in a.get('class', [])]
-           if article_links:
-               href = article_links[0]['href']
-               article_url = f"https://www.techinasia.com{href}" if not href.startswith('http') else href
-               match = re.search(r'/([^/]+)$', href)
-               article_id = match.group(1) if match else None
-               logger.info(f"Parsing article: {article_id} - {title}")
-           else:
-               logger.warning("No article links found.")
-               return None
+        except AttributeError as e:
+            logger.warning(f"⚠️ AttributeError parsing article: {article_element}, error: {e}")
+            return None
+        except Exception as e:
+            logger.warning(f"⚠️ Error parsing article: {article_element}, error: {e}")
+            return None
 
-           # Get source information
-           logger.info(f"  - 📰 Extracting source...")
-           source_element = content_div.find('span', class_='post-source-name')
-           source = source_element.text.strip() if source_element else None
-           logger.info(f"  - ✅ Source extracted: {source}")
+    def _extract_article_id_and_url(self, content_div) -> tuple[Optional[str], Optional[str]]:
+        """Extract article ID and URL"""
+        article_links = [a for a in content_div.find_all('a') if not 'post-source' in a.get('class', [])]
+        if article_links:
+            href = article_links[0]['href']
+            article_url = f"https://www.techinasia.com{href}" if not href.startswith('http') else href
+            match = re.search(r'/([^/]+)$', href)
+            article_id = match.group(1) if match else None
+            logger.info(f"Parsing article: {article_id}")
+            return article_id, article_url
+        else:
+            logger.warning("No article links found.")
+            return None, None
 
-           source_link = content_div.find('a', class_='post-source')
-           source_url = source_link.get('href') if source_link else None
-           logger.info(f"  - 🌐 Source URL extracted: {source_url}")
+    def _extract_title(self, content_div) -> Optional[str]:
+        """Extract the title of the article"""
+        title_element = content_div.find('h3', class_='post-title')
+        return title_element.text.strip() if title_element else None
 
-           # Get image information
-           logger.info(f"  - 🖼️ Extracting image URL...")
-           image_div = article_element.find('div', class_='post-image')
-           if image_div:
-               img_tag = image_div.find('img')
-               image_url = img_tag.get('src') if img_tag else None
-               logger.info(f"  - 🖼️ Image URL extracted: {image_url}")
-           else:
-               logger.warning(f"  - 🖼️ No image div found.")
+    def _extract_source_info(self, content_div) -> tuple[Optional[str], Optional[str]]:
+        """Extract source name and URL"""
+        logger.info(f"  - 📰 Extracting source...")
+        source_element = content_div.find('span', class_='post-source-name')
+        source = source_element.text.strip() if source_element else None
+        logger.info(f"  - ✅ Source extracted: {source}")
 
-           # Get time and categories/tags
-           logger.info(f"  - ⏰ Extracting time and categories/tags...")
-           footer = article_element.find('div', class_='post-footer')
-           time_element = footer.find('time') if footer else None
-           posted_time = time_element.get('datetime') if time_element else None
-           relative_time = time_element.text.strip() if time_element else None
-           logger.info(f"  - ⏰ Time extracted: {posted_time}, Relative Time: {relative_time}")
+        source_link = content_div.find('a', class_='post-source')
+        source_url = source_link.get('href') if source_link else None
+        logger.info(f"  - 🌐 Source URL extracted: {source_url}")
+        return source, source_url
 
-           # Parse categories and tags
-           if footer:
-               tag_elements = footer.find_all('a', class_='post-taxonomy-link')
-               for tag in tag_elements:
-                   tag_text = tag.text.strip('· ')
-                   if tag_text:
-                       if tag.get('href', '').startswith('/category/'):
-                           categories.append(tag_text)
-                       elif tag.get('href', '').startswith('/tag/'):
-                           tags.append(tag_text)
-               logger.info(f"  - 🏷️ Categories: {categories}, Tags: {tags}")
+    def _extract_image_url(self, article_element) -> Optional[str]:
+        """Extract image URL"""
+        logger.info(f"  - 🖼️ Extracting image URL...")
+        image_div = article_element.find('div', class_='post-image')
+        if image_div:
+            img_tag = image_div.find('img')
+            image_url = img_tag.get('src') if img_tag else None
+            logger.info(f"  - 🖼️ Image URL extracted: {image_url}")
+            return image_url
+        else:
+            logger.warning(f"  - 🖼️ No image div found.")
+            return None
 
-           article = Article(
-               article_id=article_id,
-               title=title,
-               article_url=article_url,
-               source=source,
-               source_url=source_url,
-               image_url=image_url,
-               posted_time=posted_time,
-               relative_time=relative_time,
-               categories=categories,
-               tags=tags,
-           )
-           logger.info(f"🎉 Article parsing complete: {article_id}")
-           return article
+    def _extract_time_info(self, article_element) -> tuple[Optional[str], Optional[str]]:
+        """Extract posted time and relative time"""
+        logger.info(f"  - ⏰ Extracting time and categories/tags...")
+        footer = article_element.find('div', class_='post-footer')
+        time_element = footer.find('time') if footer else None
+        posted_time = time_element.get('datetime') if time_element else None
+        relative_time = time_element.text.strip() if time_element else None
+        logger.info(f"  - ⏰ Time extracted: {posted_time}, Relative Time: {relative_time}")
+        return posted_time, relative_time
 
-       except AttributeError as e:
-           logger.warning(f"⚠️ AttributeError parsing article: {article_id}, error: {e}")
-           return None
-       except Exception as e:
-           logger.warning(f"⚠️ Error parsing article: {article_id}, error: {e}")
-           return None
+    def _extract_categories_and_tags(self, article_element) -> tuple[List[str], List[str]]:
+        """Extract categories and tags"""
+        categories = []
+        tags = []
+        footer = article_element.find('div', class_='post-footer')
+        if footer:
+            tag_elements = footer.find_all('a', class_='post-taxonomy-link')
+            for tag in tag_elements:
+                tag_text = tag.text.strip('· ')
+                if tag_text:
+                    if tag.get('href', '').startswith('/category/'):
+                        categories.append(tag_text)
+                    elif tag.get('href', '').startswith('/tag/'):
+                        tags.append(tag_text)
+            logger.info(f"  - 🏷️ Categories: {categories}, Tags: {tags}")
+        return categories, tags
 
     async def scrape(self) -> pd.DataFrame:
         """Main scraping method"""
@@ -182,7 +196,7 @@ class TechInAsiaScraper:
                 logger.warning(f"Attempt {attempt + 1} failed: {e}, retrying...")
                 if attempt == self.config.retry_count - 1:
                     raise
-                time.sleep(2 * (attempt + 1))  # Exponential backoff
+                await asyncio.sleep(2 * (attempt + 1))  # Exponential backoff
 
     async def _perform_scraping(self) -> List[Article]:
         """Perform the actual scraping"""
@@ -235,7 +249,7 @@ class TechInAsiaScraper:
             logger.info(f"Scrolled {scroll_count} times, found {len(articles)} articles")
 
             # Implementing rate limiting
-            time.sleep(uniform(self.config.min_delay, self.config.max_delay))
+            await asyncio.sleep(uniform(self.config.min_delay, self.config.max_delay))
 
         progress_bar.close()
         return articles

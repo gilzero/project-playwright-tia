@@ -1,0 +1,58 @@
+/* app/static/css/styles.css */
+
+/* Base Styles */
+body {
+    font-family: sans-serif;
+    margin: 20px;
+}
+
+/* Layout */
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Form Styles */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.form__label {
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form__input,
+.form__select,
+.form__button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table__header,
+.table__cell {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.table__header {
+    background-color: #f2f2f2;
+}

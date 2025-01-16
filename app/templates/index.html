@@ -10,25 +10,49 @@
 <body>
     <div class="container">
         <h1>TechInAsia Scraper</h1>
-        <form action="/scrape" method="post">
-             <label for="num_articles">Number of Articles:</label>
-            <input type="number" id="num_articles" name="num_articles" value="50" required>
+        <form id="scrapeForm" action="/scrape" method="post" onsubmit="return validateForm()">
+            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            
+            <label for="num_articles">Number of Articles:</label>
+            <input type="number" id="num_articles" name="num_articles" value="50" required min="1">
 
             <label for="max_scrolls">Max Scrolls:</label>
-            <input type="number" id="max_scrolls" name="max_scrolls" value="10" required>
+            <input type="number" id="max_scrolls" name="max_scrolls" value="10" required min="1">
 
-             <label for="min_delay">Min Delay (seconds):</label>
-             <input type="number" step="0.1" id="min_delay" name="min_delay" value="1" required>
+            <label for="min_delay">Min Delay (seconds):</label>
+            <input type="number" step="0.1" id="min_delay" name="min_delay" value="1" required min="0.1">
 
-             <label for="max_delay">Max Delay (seconds):</label>
-             <input type="number" step="0.1" id="max_delay" name="max_delay" value="3" required>
+            <label for="max_delay">Max Delay (seconds):</label>
+            <input type="number" step="0.1" id="max_delay" name="max_delay" value="3" required min="0.1">
 
             <label for="category">Category:</label>
-             <input type="text" id="category" name="category" value="artificial-intelligence" required>
+            <input type="text" id="category" name="category" value="artificial-intelligence" required pattern="[A-Za-z\-]+">
 
-            <button type="submit" class="btn btn-primary">Scrape Articles</button>
+            <button type="submit" class="btn btn-primary" id="submitButton">Scrape Articles</button>
         </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function validateForm() {
+            const minDelay = parseFloat(document.getElementById('min_delay').value);
+            const maxDelay = parseFloat(document.getElementById('max_delay').value);
+            const errorMessage = document.getElementById('error-message');
+
+            if (minDelay > maxDelay) {
+                errorMessage.textContent = "Min Delay cannot be greater than Max Delay.";
+                errorMessage.style.display = 'block';
+                return false;
+            }
+            errorMessage.style.display = 'none';
+            showLoadingState();
+            return true;
+        }
+
+        function showLoadingState() {
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Fetching articles...';
+        }
+    </script>
 </body>
 </html>

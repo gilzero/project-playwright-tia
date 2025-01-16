@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+app/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -26,6 +26,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.pyc
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -115,3 +116,9 @@ dmypy.json
 
 # vscode
 .vscode/
+
+# Logs directory
+logs/
+
+# Output directory
+output/
