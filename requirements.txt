@@ -8,3 +8,6 @@ python-dateutil
 tqdm
 jinja2
 python-multipart
+selenium
+aiohttp
+nest_asyncio
