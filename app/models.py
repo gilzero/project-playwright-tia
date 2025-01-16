@@ -28,21 +28,20 @@ class Article(BaseModel):
             return None
         return v
 
-    @field_validator('posted_time', mode='before')
-    def convert_posted_time(cls, v):
-        """Convert posted_time to ISO format"""
-        if v:
+    @field_validator('posted_time_iso', mode='before')
+    def convert_posted_time(cls, v, values):
+        posted_time = values.data.get('posted_time')
+        if posted_time:
             try:
-                dt = parser.parse(v)
+                dt = parser.parse(posted_time)
                 return dt.isoformat()
             except (ValueError, TypeError) as e:
-                logger.warning(f"Failed to parse posted_time: {v}, error: {e}")
-                return None
-        return v
+                logger.warning(f"Failed to parse posted_time: {posted_time}, error: {e}")
+        return None
 
     def model_dump_json(self) -> str:
         """Convert the Article instance to a JSON string"""
-        return self.json()
+        return self.model_dump_json()
 
 
 class ScraperConfig(BaseModel):

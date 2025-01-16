@@ -1,9 +1,18 @@
 /* app/static/css/styles.css */
 
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f9f9f9;
+    --text-color: #333;
+}
+
 /* Base Styles */
 body {
-    font-family: sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 20px;
+    color: var(--text-color);
+    background-color: var(--background-color);
 }
 
 /* Layout */
@@ -13,7 +22,8 @@ body {
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Form Styles */
@@ -54,5 +64,25 @@ body {
 }
 
 .table__header {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
     background-color: #f2f2f2;
+}
+
+/* Button Styles */
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
 }

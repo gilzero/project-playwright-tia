@@ -8,25 +8,59 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">TechInAsia Scraper</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
-        <h1>TechInAsia Scraper</h1>
+        <h1 class="mb-4">TechInAsia Scraper</h1>
         <form id="scrapeForm" action="/scrape" method="post" onsubmit="return submitForm(event)">
             <div id="error-message" class="alert alert-danger" style="display: none;"></div>
 
-            <label for="num_articles">Number of Articles:</label>
-            <input type="number" id="num_articles" name="num_articles" value="50" required min="1">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="num_articles" class="form-label">Number of Articles:</label>
+                    <input type="number" id="num_articles" name="num_articles" class="form-control" value="50" required min="1">
+                </div>
+                <div class="col">
+                    <label for="max_scrolls" class="form-label">Max Scrolls:</label>
+                    <input type="number" id="max_scrolls" name="max_scrolls" class="form-control" value="10" required min="1">
+                </div>
+            </div>
 
-            <label for="max_scrolls">Max Scrolls:</label>
-            <input type="number" id="max_scrolls" name="max_scrolls" value="10" required min="1">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="min_delay" class="form-label">Min Delay (seconds):</label>
+                    <input type="number" step="0.1" id="min_delay" name="min_delay" class="form-control" value="1" required min="0.1">
+                </div>
+                <div class="col">
+                    <label for="max_delay" class="form-label">Max Delay (seconds):</label>
+                    <input type="number" step="0.1" id="max_delay" name="max_delay" class="form-control" value="3" required min="0.1">
+                </div>
+            </div>
 
-            <label for="min_delay">Min Delay (seconds):</label>
-            <input type="number" step="0.1" id="min_delay" name="min_delay" value="1" required min="0.1">
-
-            <label for="max_delay">Max Delay (seconds):</label>
-            <input type="number" step="0.1" id="max_delay" name="max_delay" value="3" required min="0.1">
-
-            <label for="category">Category:</label>
-            <input type="text" id="category" name="category" value="artificial-intelligence" required pattern="[A-Za-z\-]+">
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
+                <input type="text" id="category" name="category" class="form-control" value="artificial-intelligence" required pattern="[A-Za-z\-]+">
+            </div>
 
             <button type="submit" class="btn btn-primary" id="submitButton">Scrape Articles</button>
         </form>
