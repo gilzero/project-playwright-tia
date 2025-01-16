@@ -19,7 +19,7 @@ class Article(BaseModel):
     categories: List[str] = Field(default_factory=list)
     tags: List[str] = Field(default_factory=list)
     scraped_at: str = Field(default_factory=lambda: datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    posted_time_iso: Optional[str] = None
+
 
     @field_validator('article_url', 'source_url', 'image_url', mode='before')
     def validate_urls(cls, v):
@@ -27,17 +27,6 @@ class Article(BaseModel):
         if v == 'N/A':
             return None
         return v
-
-    @field_validator('posted_time_iso', mode='before')
-    def convert_posted_time(cls, v, values):
-        posted_time = values.data.get('posted_time')
-        if posted_time:
-            try:
-                dt = parser.parse(posted_time)
-                return dt.isoformat()
-            except (ValueError, TypeError) as e:
-                logger.warning(f"Failed to parse posted_time: {posted_time}, error: {e}")
-        return None
 
     def model_dump_json(self) -> str:
         """Convert the Article instance to a JSON string"""
