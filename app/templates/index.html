@@ -1,137 +1,149 @@
 <!-- app/templates/index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>TechInAsia Scraper</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">TechInAsia Scraper</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
-                    </li>
-                </ul>
+{% extends "base.html" %}
+
+{% block title %}TechInAsia Scraper - Home{% endblock %}
+
+{% block home_active %}active{% endblock %}
+
+{% block page_title %}TechInAsia Scraper{% endblock %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', path='/js/form-validation.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<p class="lead">Configure the scraper with advanced options for human-like behavior simulation.</p>
+
+<form id="scrapeForm" action="/scrape" method="post" onsubmit="return submitForm(event)">
+    <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Basic Scraping Parameters</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="num_articles" class="form-label">Number of Articles:</label>
+                    <input type="number" id="num_articles" name="num_articles" class="form-control" value="50" required min="1" max="200">
+                    <div class="form-text">Maximum number of articles to scrape (1-200)</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="max_scrolls" class="form-label">Max Scrolls:</label>
+                    <input type="number" id="max_scrolls" name="max_scrolls" class="form-control" value="10" required min="1" max="50">
+                    <div class="form-text">Maximum number of page scrolls (1-50)</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="category" class="form-label">Category:</label>
+                    <select id="category" name="category" class="form-select">
+                        <option value="artificial-intelligence">Artificial Intelligence</option>
+                        <option value="fintech">Fintech</option>
+                        <option value="e-commerce">E-commerce</option>
+                        <option value="startups">Startups</option>
+                        <option value="investments">Investments</option>
+                    </select>
+                    <div class="form-text">Category to scrape from TechInAsia</div>
+                </div>
             </div>
         </div>
-    </nav>
-
-    <div class="container">
-        <h1 class="mb-4">TechInAsia Scraper</h1>
-        <form id="scrapeForm" action="/scrape" method="post" onsubmit="return submitForm(event)">
-            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
-
-            <div class="row mb-3">
-                <div class="col">
-                    <label for="num_articles" class="form-label">Number of Articles:</label>
-                    <input type="number" id="num_articles" name="num_articles" class="form-control" value="50" required min="1">
-                </div>
-                <div class="col">
-                    <label for="max_scrolls" class="form-label">Max Scrolls:</label>
-                    <input type="number" id="max_scrolls" name="max_scrolls" class="form-control" value="10" required min="1">
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col">
-                    <label for="min_delay" class="form-label">Min Delay (seconds):</label>
-                    <input type="number" step="0.1" id="min_delay" name="min_delay" class="form-control" value="1" required min="0.1">
-                </div>
-                <div class="col">
-                    <label for="max_delay" class="form-label">Max Delay (seconds):</label>
-                    <input type="number" step="0.1" id="max_delay" name="max_delay" class="form-control" value="3" required min="0.1">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="category" class="form-label">Category:</label>
-                <input type="text" id="category" name="category" class="form-control" value="artificial-intelligence" required pattern="[A-Za-z\-]+">
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="submitButton">Scrape Articles</button>
-        </form>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function validateForm() {
-            const minDelay = parseFloat(document.getElementById('min_delay').value);
-            const maxDelay = parseFloat(document.getElementById('max_delay').value);
-            const errorMessage = document.getElementById('error-message');
 
-            if (minDelay > maxDelay) {
-                errorMessage.textContent = "Min Delay cannot be greater than Max Delay.";
-                errorMessage.style.display = 'block';
-                return false;
-            }
-            errorMessage.style.display = 'none';
-            return true;
-        }
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Human-like Behavior Simulation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Scroll Iterations Range:</label>
+                    <div class="input-group">
+                        <input type="number" id="scroll_iterations_min" name="scroll_iterations_min" class="form-control" value="1" required min="1" max="10">
+                        <span class="input-group-text">to</span>
+                        <input type="number" id="scroll_iterations_max" name="scroll_iterations_max" class="form-control" value="3" required min="1" max="10">
+                    </div>
+                    <div class="form-text">Number of scroll actions per page (1-10)</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Scroll Distance Range (pixels):</label>
+                    <div class="input-group">
+                        <input type="number" id="scroll_distance_min" name="scroll_distance_min" class="form-control" value="50" required min="10" max="500">
+                        <span class="input-group-text">to</span>
+                        <input type="number" id="scroll_distance_max" name="scroll_distance_max" class="form-control" value="200" required min="10" max="500">
+                    </div>
+                    <div class="form-text">Distance to scroll in pixels (10-500)</div>
+                </div>
+            </div>
 
-        async function submitForm(event) {
-            event.preventDefault(); // Prevent default form submission
-            if (!validateForm()) {
-                return;
-            }
-            showLoadingState();
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Sleep After Scroll Range (seconds):</label>
+                    <div class="input-group">
+                        <input type="number" id="sleep_scroll_min" name="sleep_scroll_min" class="form-control" value="0.1" required min="0.1" max="2.0" step="0.1">
+                        <span class="input-group-text">to</span>
+                        <input type="number" id="sleep_scroll_max" name="sleep_scroll_max" class="form-control" value="0.5" required min="0.1" max="2.0" step="0.1">
+                    </div>
+                    <div class="form-text">Delay after scrolling (0.1-2.0 seconds)</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">URL Request Delay Range (seconds):</label>
+                    <div class="input-group">
+                        <input type="number" id="url_delay_min" name="url_delay_min" class="form-control" value="0.5" required min="0.1" max="5.0" step="0.1">
+                        <span class="input-group-text">to</span>
+                        <input type="number" id="url_delay_max" name="url_delay_max" class="form-control" value="2.0" required min="0.1" max="5.0" step="0.1">
+                    </div>
+                    <div class="form-text">Delay between URL requests (0.1-5.0 seconds)</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            const form = document.getElementById('scrapeForm');
-            const formData = new FormData(form);
-            const jsonData = {};
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
-            });
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Randomization Options</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="randomize_user_agent" name="randomize_user_agent" checked>
+                        <label class="form-check-label" for="randomize_user_agent">Randomize User Agent</label>
+                    </div>
+                    <div class="form-text">Use different user agents for each request</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="randomize_viewport" name="randomize_viewport" checked>
+                        <label class="form-check-label" for="randomize_viewport">Randomize Viewport Size</label>
+                    </div>
+                    <div class="form-text">Use different viewport sizes for each request</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            try {
-                const response = await fetch('/scrape', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(jsonData),
-                });
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">Output Options</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="save_content" name="save_content" checked>
+                        <label class="form-check-label" for="save_content">Extract Full Article Content</label>
+                    </div>
+                    <div class="form-text">Extract and save the full content of each article</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                if (response.ok) {
-                    const html = await response.text();
-                    document.body.innerHTML = html; // Replace the entire body with the response
-                } else if (response.status === 400) {
-                    const errorText = await response.text();
-                    document.getElementById('error-message').textContent = "Bad Request: " + errorText;
-                    document.getElementById('error-message').style.display = 'block';
-                } else if (response.status === 500) {
-                    const errorText = await response.text();
-                    document.getElementById('error-message').textContent = "Server Error: " + errorText;
-                    document.getElementById('error-message').style.display = 'block';
-                } else {
-                    const errorText = await response.text();
-                    document.getElementById('error-message').textContent = "Unexpected Error: " + errorText;
-                    document.getElementById('error-message').style.display = 'block';
-                }
-            } catch (error) {
-                document.getElementById('error-message').textContent = "Network Error: " + error.message;
-                document.getElementById('error-message').style.display = 'block';
-                console.error('Fetch error:', error);
-            }
-        }
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary btn-lg">Scrape Articles</button>
+    </div>
+</form>
+{% endblock %}
 
-        function showLoadingState() {
-            const submitButton = document.getElementById('submitButton');
-            submitButton.disabled = true;
-            submitButton.textContent = 'Fetching articles...';
-        }
-    </script>
-</body>
-</html>
+{% block scripts %}
+<!-- Form validation script is loaded in the head section -->
+{% endblock %}
