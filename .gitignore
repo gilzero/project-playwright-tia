@@ -118,8 +118,9 @@ dmypy.json
 .vscode/
 
 # Logs directory
-logs/
+*.log
 
 # Output directory
-output/
-*.log
+output/*.txt
+output/*.json
+output/*.csv
