@@ -7,6 +7,7 @@ import asyncio
 import argparse
 from datetime import datetime
 from playwright.async_api import async_playwright
+import json
 
 from app.models import ScraperConfig
 from app.core import TechInAsiaScraper
@@ -85,24 +86,37 @@ def parse_args():
     return parser.parse_args()
 
 async def main():
-    """Main entry point for the test script."""
-    args = parse_args()
+    # Create a simple configuration
+    config = ScraperConfig(num_articles=1, max_scrolls=1)
     
-    # Create configuration
-    config = ScraperConfig(
-        num_articles=args.num_articles,
-        max_scrolls=args.max_scrolls,
-        category=args.category,
-        output_dir=args.output_dir,
-        log_file="logs/test_scraper.log",
-        log_level=args.log_level,
-        extract_content=args.extract_content,
-        randomize_user_agent=args.randomize_user_agent,
-        randomize_viewport=args.randomize_viewport
-    )
+    # Initialize and run the scraper
+    scraper = TechInAsiaScraper(config)
+    result = await scraper.scrape()
     
-    # Run the test
-    await test_scraper(config)
+    print("\nScraping completed. Checking output directory:")
+    print(os.listdir('output'))
+    
+    # Find the latest JSON file
+    json_files = [f for f in os.listdir('output') if f.endswith('.json')]
+    if not json_files:
+        print("No JSON files found")
+        return
+        
+    latest_file = sorted(json_files, key=lambda x: os.path.getmtime(os.path.join('output', x)), reverse=True)[0]
+    print(f"Latest output file: {latest_file}")
+    
+    # Read and display content preview
+    with open(os.path.join('output', latest_file), 'r') as f:
+        data = json.load(f)
+        
+    print(f"Number of articles: {len(data)}")
+    
+    if data:
+        article = data[0]
+        print(f"Article ID: {article.get('article_id')}")
+        content = article.get('content', '')
+        print(f"Content length: {len(content)} characters")
+        print(f"Content preview: {content[:200]}...")
 
 if __name__ == "__main__":
     asyncio.run(main()) 

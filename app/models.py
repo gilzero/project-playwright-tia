@@ -40,7 +40,7 @@ class ScraperConfig(BaseModel):
     num_articles: int = 50
     max_scrolls: int = 10
     timeout: int = 20000  # in milliseconds
-    retry_count: int = 3
+    retry_count: int = 5
     batch_size: int = 100
     base_url: str = 'https://www.techinasia.com/news'
     output_dir: str = 'output'
@@ -53,7 +53,7 @@ class ScraperConfig(BaseModel):
     mouse_movements_range: Tuple[int, int] = (1, 3)
     sleep_scroll_range: Tuple[float, float] = (0.1, 0.5)
     sleep_mouse_range: Tuple[float, float] = (0.1, 0.3)
-    url_delay_range: Tuple[float, float] = (0.5, 2.0)
+    url_delay_range: Tuple[float, float] = (1.0, 3.0)
     
     # Randomization parameters
     randomize_user_agent: bool = True
@@ -88,6 +88,19 @@ class ScraperConfig(BaseModel):
         "div#content.content",
         "div.jsx-3810287742.jsx-430771670.content",
         "article.content",
+        "div.article-content",
+        "div.article-body",
+        "div.story-content",
+        "div.story-body",
+        "div.post-content",
+        "div.entry-content",
+        "main article",
+        "main .content",
+        "article .content",
+        ".article__body",
+        ".article__content",
+        ".post__content",
+        ".post-body",
     ])
     
     # Logging configuration

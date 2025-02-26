@@ -3,7 +3,7 @@ import os
 import uvicorn
 import argparse
 from app.api import app
-from app.utils import setup_logging
+from app.logger import setup_logging
 from app.models import ScraperConfig
 
 def parse_arguments():
@@ -26,8 +26,9 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     
     # Setup logging
-    log_file = os.path.join("logs", "app.log")
-    logger = setup_logging(log_file=log_file, log_level=args.log_level.upper())
+    log_dir = "logs"
+    os.makedirs(log_dir, exist_ok=True)
+    logger = setup_logging(log_dir=log_dir, log_level=args.log_level.upper())
     
     # Create default config for the app context
     default_config = ScraperConfig(
@@ -35,7 +36,7 @@ def main():
         max_scrolls=5,
         category="startups",
         output_dir=args.output_dir,
-        log_file=log_file,
+        log_file=os.path.join(log_dir, "app.log"),
         log_level=args.log_level.upper()
     )
     

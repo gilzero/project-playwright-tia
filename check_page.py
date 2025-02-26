@@ -12,7 +12,7 @@ def main():
         
         # Navigate to the page
         print("Navigating to TechInAsia...")
-        page.goto('https://www.techinasia.com/news?category=startups', timeout=60000)
+        page.goto('https://www.techinasia.com/news?category=artificial-intelligence', timeout=60000)
         
         # Wait for the page to load
         print("Waiting for page to load...")
